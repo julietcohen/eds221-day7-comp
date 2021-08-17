@@ -1,0 +1,119 @@
+---
+title: "Dates-and-times"
+author: "Juliet"
+date: "8/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lubridate)
+```
+
+## play around with functions in lubridate
+```{r}
+my_data <- "03-15-1998"
+class(my_data)
+#need to provide order of elements in this date
+```
+
+ymd, mdy, dmy
+
+```{r}
+lubridate::mdy(my_date)
+my_date_new <- mdy(my_date)
+class(my_date_new)
+```
+## try converting the following to dates:
+
+4/6/2005 (m,d,y)
+20100806 (y, m, d)
+12-Jun-1974 
+my birthday
+```{r}
+ex_1 <- mdy("4/6/2005")
+ex_1
+
+ex_2 <- ymd("20100806")
+ex_2
+
+ex_3 <- dmy("12-Jun-1974")
+ex_3
+
+ex_4 <- mdy("04081997")
+ex_4
+
+ex_5 <- dmy(c("17-Feb-1990", "08/03/1991"))
+ex_5
+
+#need to match m d y with logical numbers (like you cannot do month 20) and if you do 1 it will error, if you do multiple dates and only 1 does not work it will show up at NA
+
+
+```
+
+```{r}
+time <- "2020-08-12 11:18"
+time
+
+ex_6 <- ymd_hm(time)
+ex_6
+class(ex_6)
+
+ex_7 <- ymd_hms("2020-08-12 11:18:30")
+ex_7
+
+time_la <- with_tz(ex_6, "America/Los_Angeles")
+time_la
+
+# create a date time
+# convert it to sydney australia
+
+ex_8 <- mdy_hm("11/03/1995 12:08")
+ex_8
+converted_ex_8 <- ex_8 <- with_tz(ex_8, "Australia/Sydney")
+converted_ex_8
+```
+
+```{r}
+lubridate::week(converted_ex_8)
+lubridate::day(converted_ex_8)
+lubridate::minute((converted_ex_8))
+```
+
+```{r}
+my_bday <- lubridate::ymd("1997-04-08")
+class(my_bday)
+
+wday(my_bday, label = TRUE)
+#tells you the day of the week for that date
+
+my_future_bday <- lubridate::ymd("2022-04-08")
+wday(my_future_bday, label = TRUE)
+```
+
+```{r}
+urchin_counts <- tribble(
+  ~date, ~species, ~size_mm,
+  "10/3/2020", "purple", 55,
+  "10/4/2020", "red", 48,
+  "11/17/2020", "red", 67
+)
+
+urchin_counts_ymd <- urchin_counts %>% 
+  mutate(date = lubridate::mdy(date)) %>% 
+  mutate(year = year(date)) %>% 
+  mutate(month = month(date))
+
+urchin_counts_ymd
+```
+
+
+
+
+
+
+
+
+
+
