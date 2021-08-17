@@ -1,0 +1,126 @@
+---
+title: "morning-comp-datapasta"
+author: "Juliet"
+date: "8/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(palmerpenguins)
+```
+
+### warm up task
+
+```{r}
+warm_up <- penguins %>% 
+  filter(island %in% c("Biscoe", "Dream")) %>% 
+  #use unique() to check this
+  select(-year, -sex) %>% 
+  #can also put - in front of vector gthat includes both year and select
+  mutate(body_mass_kg = (body_mass_g)/1000) %>% 
+  rename(location = island)
+  
+  #colnames("species", "location", "bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g", "sex", "year", "body_mass_kg")
+
+```
+
+
+### warm up task 2
+
+```{r}
+ex_2 <- penguins %>% 
+  filter(species == "Adelie") %>% 
+  drop_na(flipper_length_mm) %>% 
+  group_by(sex) %>% 
+  summarize(
+    mean_flip = mean(flipper_length_mm),
+    sd_flip = sd(flipper_length_mm),
+    sample_size = n()
+    #do not need na.rm = TRUE because already got rid of them in earluer line
+  )
+```
+
+## Data Pasta : Joins Practice
+
+```{r}
+
+# copy data from table online to computer clipboard, then have cursor in chunk and go to addins --> paste as tibble
+
+# data pasta in NOT a good alternative to importing data if your data is in a file, this is a very specific use case
+
+animals <- tibble::tribble(
+  ~location,   ~species,  ~maturity,
+   "lagoon",   "bobcat",    "adult",
+    "bluff",   "coyote", "juvenile",
+    "creek",      "fox",    "adult",
+     "oaks", "squirrel", "juvenile",
+    "bluff",   "bobcat",    "adult"
+  )
+
+sites <- tibble::tribble(
+  ~location,      ~full_site_name, ~jurisdiction,
+    "beach",       "Goleta Beach",     "SB City",
+   "lagoon",        "UCSB Lagoon",        "UCSB",
+    "bluff",       "Ellwood Mesa",     "SB City",
+     "oaks", "Fremont Campground",        "USFS",
+  "bluff", "More Mesa", "SB City"
+  )
+
+```
+
+## Mutating Joins
+
+### full join
+
+```{r}
+animals_full_join <- full_join(animals, sites)
+animals_full_join
+# r tells you that you are joining by location because it auto assumes that col with the same name are the key
+#AKA
+animals_full_join <- full_join(animals, sites, by = "location")
+```
+
+### left join
+
+```{r}
+animals_left_join <- left_join(animals, sites)
+# drops beach (from R data frame) and keeps everything from left data frame, but creek has NA's in new col that were addded by the R data frame
+```
+
+### inner join
+
+```{r}
+animals_inner_join <- inner_join(animals, sites)
+  
+#drops things that do not match in other table, so drop creek and beach
+# does almost same thing as full join with na.rm = true, but this drops any NA's in your original dataset, so make suer you dont have any NA values in dataset before you join
+```
+
+## Filtering Joins - no col added
+
+### Semi join
+
+```{r}
+animals_semi_join <- semi_join(animals, sites, by = "location")
+#keeps all the col in animals and removes the rows that do not occur in sites
+# examples when this would be useful: 
+# - you want to limit your list of colleges that have the major you're interested in, so reducing the number of colleges (rows) depending on if there is a key match with the dataframe that includes colleges with that major plus other academic info you dont care about
+# - reducing your total contacts list to just the people that said they are available to come to your party to send invites
+# - you saw a dataset of birds and have a larger dataset of all native birds in the area, and you want to reduce your list of obs birds to only the native ones, so reducing the number of obs, and you dont care about adding more info in more col about those birds 
+
+```
+
+### anti join
+
+```{r}
+# keeps only the values that do not match, and keeps col # same
+animals_anti_join <- anti_join(animals, sites, by = "location")
+site_anti_join <- anti_join(sites, animals, by = "location")
+# flipping left and right dataframes matters because it keeps only the non-matching rows from l datafrome, does not show the non-matching col that may exist in the R dataframe
+```
+
+
+
+
